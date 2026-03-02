@@ -1,27 +1,35 @@
 public class PalindromeCheckerApp {
 
     public static void main(String[] args) {
-        // Hardcoded string literal with spaces and mixed case
-        String word = "A man a plan a canal Panama";
+        // Create an instance of PalindromeChecker
+        PalindromeChecker checker = new PalindromeChecker();
 
-        // Normalize string: remove spaces and convert to lowercase
-        String normalized = word.replaceAll("\\s+", "").toLowerCase();
+        // Hardcoded string literal
+        String word = "Madam";
 
-        // Check palindrome using two-pointer approach
-        if (isPalindrome(normalized)) {
-            System.out.println("\"" + word + "\" is a palindrome (ignoring case and spaces).");
+        // Call the encapsulated method
+        if (checker.checkPalindrome(word)) {
+            System.out.println(word + " is a palindrome.");
         } else {
-            System.out.println("\"" + word + "\" is not a palindrome.");
+            System.out.println(word + " is not a palindrome.");
         }
     }
+}
 
-    // Method to check palindrome
-    public static boolean isPalindrome(String str) {
+// Encapsulated PalindromeChecker class
+class PalindromeChecker {
+
+    // Public method to check palindrome
+    public boolean checkPalindrome(String input) {
+        // Normalize input (case-insensitive, ignore spaces)
+        String normalized = input.replaceAll("\\s+", "").toLowerCase();
+
+        // Two-pointer approach
         int left = 0;
-        int right = str.length() - 1;
+        int right = normalized.length() - 1;
 
         while (left < right) {
-            if (str.charAt(left) != str.charAt(right)) {
+            if (normalized.charAt(left) != normalized.charAt(right)) {
                 return false;
             }
             left++;
