@@ -1,75 +1,69 @@
-// PalindromeStrategy interface
-interface PalindromeStrategy {
-    boolean checkPalindrome(String input);
-}
+public class PalindromeCheckerApp {
 
-// Stack-based strategy
-class StackStrategy implements PalindromeStrategy {
-    @Override
-    public boolean checkPalindrome(String input) {
-        String normalized = input.replaceAll("\\s+", "").toLowerCase();
-        java.util.Stack<Character> stack = new java.util.Stack<>();
+    public static void main(String[] args) {
+        String word = "A man a plan a canal Panama";
 
-        for (char c : normalized.toCharArray()) {
-            stack.push(c);
-        }
+        // Normalize input for fair comparison
+        String normalized = word.replaceAll("\\s+", "").toLowerCase();
 
-        String reversed = "";
-        while (!stack.isEmpty()) {
-            reversed += stack.pop();
-        }
-
-        return normalized.equals(reversed);
+        // Run and time different algorithms
+        runAndMeasure("Two-Pointer", () -> isPalindromeTwoPointer(normalized));
+        runAndMeasure("Stack-Based", () -> isPalindromeStack(normalized));
+        runAndMeasure("Deque-Based", () -> isPalindromeDeque(normalized));
+        runAndMeasure("Recursive", () -> isPalindromeRecursive(normalized, 0, normalized.length() - 1));
     }
-}
 
-// Deque-based strategy
-class DequeStrategy implements PalindromeStrategy {
-    @Override
-    public boolean checkPalindrome(String input) {
-        String normalized = input.replaceAll("\\s+", "").toLowerCase();
-        java.util.Deque<Character> deque = new java.util.LinkedList<>();
+    // Utility method to measure execution time
+    public static void runAndMeasure(String name, RunnableCheck check) {
+        long start = System.nanoTime();
+        boolean result = check.run();
+        long end = System.nanoTime();
+        System.out.println(name + " -> " + (result ? "Palindrome" : "Not Palindrome")
+                + " | Time: " + (end - start) + " ns");
+    }
 
-        for (char c : normalized.toCharArray()) {
-            deque.add(c);
-        }
+    // Functional interface for algorithm checks
+    interface RunnableCheck {
+        boolean run();
+    }
 
-        while (deque.size() > 1) {
-            if (deque.removeFirst() != deque.removeLast()) {
-                return false;
-            }
+    // Two-pointer approach
+    public static boolean isPalindromeTwoPointer(String str) {
+        int left = 0, right = str.length() - 1;
+        while (left < right) {
+            if (str.charAt(left) != str.charAt(right)) return false;
+            left++;
+            right--;
         }
         return true;
     }
-}
 
-// Context class that uses a strategy
-class PalindromeChecker {
-    private PalindromeStrategy strategy;
+    // Stack-based approach
+    public static boolean isPalindromeStack(String str) {
+        java.util.Stack<Character> stack = new java.util.Stack<>();
+        for (char c : str.toCharArray()) stack.push(c);
 
-    // Inject strategy at runtime
-    public PalindromeChecker(PalindromeStrategy strategy) {
-        this.strategy = strategy;
+        String reversed = "";
+        while (!stack.isEmpty()) reversed += stack.pop();
+
+        return str.equals(reversed);
     }
 
-    public boolean check(String input) {
-        return strategy.checkPalindrome(input);
+    // Deque-based approach
+    public static boolean isPalindromeDeque(String str) {
+        java.util.Deque<Character> deque = new java.util.LinkedList<>();
+        for (char c : str.toCharArray()) deque.add(c);
+
+        while (deque.size() > 1) {
+            if (deque.removeFirst() != deque.removeLast()) return false;
+        }
+        return true;
     }
-}
 
-// Main application
-public class PalindromeCheckerApp {
-    public static void main(String[] args) {
-        String word = "Racecar";
-
-        // Choose strategy dynamically
-        PalindromeChecker checker1 = new PalindromeChecker(new StackStrategy());
-        PalindromeChecker checker2 = new PalindromeChecker(new DequeStrategy());
-
-        System.out.println("Using StackStrategy:");
-        System.out.println(word + " -> " + (checker1.check(word) ? "Palindrome" : "Not Palindrome"));
-
-        System.out.println("Using DequeStrategy:");
-        System.out.println(word + " -> " + (checker2.check(word) ? "Palindrome" : "Not Palindrome"));
+    // Recursive approach
+    public static boolean isPalindromeRecursive(String str, int left, int right) {
+        if (left >= right) return true;
+        if (str.charAt(left) != str.charAt(right)) return false;
+        return isPalindromeRecursive(str, left + 1, right - 1);
     }
 }
